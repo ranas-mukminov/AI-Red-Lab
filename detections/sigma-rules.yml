@@ -1,0 +1,47 @@
+title: AI Lab — Prompt Injection Attempt Logged
+id: lab-ai-001
+status: experimental
+description: Fires on lab harness log lines for prompt-injection cases with a fail verdict. Lab format only.
+logsource:
+  product: ai-red-lab
+  service: harness
+detection:
+  selection:
+    category: 'prompt_injection'
+    verdict: 'fail'
+  condition: selection
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1203
+---
+title: AI Lab — Jailbreak Attempt Logged
+id: lab-ai-002
+status: experimental
+description: Fires on lab harness log lines for jailbreak cases with a fail verdict. Lab format only.
+logsource:
+  product: ai-red-lab
+  service: harness
+detection:
+  selection:
+    category: 'jailbreak'
+    verdict: 'fail'
+  condition: selection
+level: high
+tags:
+  - attack.defense_evasion
+---
+title: AI Lab — Secret Pattern In Model Response
+id: lab-ai-003
+status: experimental
+description: Fires when a harness result records a secret-like pattern in a model response. Lab format only.
+logsource:
+  product: ai-red-lab
+  service: harness
+detection:
+  selection:
+    secret_pattern: true
+  condition: selection
+level: critical
+tags:
+  - attack.credential_access

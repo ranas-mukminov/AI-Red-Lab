@@ -44,3 +44,9 @@ that prompt set, and the report records exactly those three things.
 Test prompts in `cases/` are written for a local lab model. Do not send
 them to production systems, do not use them to extract real data, and do
 not use the harness to probe a service you do not own.
+
+## Recent additions
+
+- Case catalogue expanded from 6 to 15 cases, including jailbreak-framing cases that the stub now refuses.
+- `lab/local_model.py`: adapter interface for a model the user runs locally (callable, or a localhost HTTP endpoint). No provider API, no keys, no external calls; non-local URLs are rejected.
+- `docs/attack-mapping.md` and `detections/sigma-rules.yml`: illustrative MITRE ATLAS mapping and Sigma-style detection rules in lab log format.

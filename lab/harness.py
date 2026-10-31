@@ -4,10 +4,11 @@ Usage:
     python3 lab/harness.py --cases cases/catalogue.json --model stub \
         --out results/my_run.json
 
-The only built-in model is "stub". Any other --model value is rejected:
-the harness does not call external providers, and adding a provider
-backend would require its own scope, key handling and owner approval.
-A report records the model name, the case set, and per-case results.
+The built-in model is "stub". The only other option is "local",
+which uses lab/local_model.py against a model the user runs on
+localhost. The harness never calls external providers, never sends
+a key, and rejects non-local URLs. A report records the model name,
+the case set, and per-case results.
 """
 
 import argparse
@@ -53,12 +54,26 @@ def evaluate_case(case, response):
     }
 
 
-def run(cases_path, out_path):
+def run(cases_path, out_path, model="stub", local_url=None):
     cases = json.loads(Path(cases_path).read_text())
-    results = [evaluate_case(c, respond(c["prompt"])) for c in cases]
+    if model == "stub":
+        model_obj = respond
+        model_label = "stub (local, deterministic)"
+        model_version = "stub-v1"
+    elif model == "local":
+        if not local_url:
+            raise ValueError("--local-url is required with --model local")
+        from local_model import LocalHTTPModel
+        adapter = LocalHTTPModel(local_url)
+        model_obj = adapter.respond
+        model_label = f"local http ({local_url})"
+        model_version = "local-v1"
+    else:
+        raise ValueError(f"unknown model: {model}")
+    results = [evaluate_case(c, model_obj(c["prompt"])) for c in cases]
     summary = {
-        "model": "stub (local, deterministic)",
-        "model_version": "stub-v1",
+        "model": model_label,
+        "model_version": model_version,
         "case_count": len(results),
         "pass": sum(1 for r in results if r["verdict"] == "pass"),
         "fail": sum(1 for r in results if r["verdict"] == "fail"),
@@ -74,10 +89,12 @@ def run(cases_path, out_path):
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--cases", required=True)
-    parser.add_argument("--model", required=True, choices=["stub"])
+    parser.add_argument("--model", required=True, choices=["stub", "local"])
+    parser.add_argument("--local-url", default=None,
+                        help="localhost URL of a user-run local model (local only)")
     parser.add_argument("--out", required=True)
     args = parser.parse_args(argv)
-    summary = run(args.cases, args.out)
+    summary = run(args.cases, args.out, model=args.model, local_url=args.local_url)
     print(f"cases={summary['case_count']} pass={summary['pass']} "
           f"fail={summary['fail']} review={summary['review']}")
     print(f"wrote {args.out}")
