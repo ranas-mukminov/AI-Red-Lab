@@ -1,3 +1,23 @@
+> **Problem:** testing a language model for prompt injection and jailbreaks usually means sending prompts to a production API you do not control.
+>
+> **What this is:** an LLM red teaming lab that runs locally: a 15-case catalogue, an evaluation harness, guardrail checks and a local-model adapter. **Local stub and local models only — no production provider API, no keys, no third-party model.**
+>
+> **Who it is for:** people learning or evaluating LLM safety on models they own and run themselves.
+>
+> **Quickstart:**
+>
+> ```bash
+> git clone https://github.com/ranas-mukminov/AI-Red-Lab.git
+> cd AI-Red-Lab
+> python3 -m unittest discover -s tests -v
+> python3 lab/harness.py --cases cases/catalogue.json --model stub --out results/my_run.json
+> ```
+>
+> **Sample result (verified run):** `cases=15 pass=15 fail=0 review=0` against the local stub. A stub run proves the harness works; it proves nothing about a production model.
+>
+[![CI](https://github.com/ranas-mukminov/AI-Red-Lab/actions/workflows/tests.yml/badge.svg)](https://github.com/ranas-mukminov/AI-Red-Lab/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+---
 # AI-Red-Lab
 
 A red-teaming lab for language models that you run yourself, locally.
